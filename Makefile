@@ -6,7 +6,7 @@
 #    By: sdi-lega <sdi-lega@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/25 11:25:36 by sdi-lega          #+#    #+#              #
-#    Updated: 2022/03/25 12:27:28 by sdi-lega         ###   ########.fr        #
+#    Updated: 2022/03/25 15:36:07 by sdi-lega         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,6 +27,7 @@ NAME			=	Template
 SOURCES_DIR		=	sources/
 SUB_DIR			=	mandatory/
 OBJECTS_DIR		=	${SOURCES_DIR}${SUB_DIR}objects/
+LIB_DIR			=	libraries/
 
 #####################################
 #									#
@@ -46,11 +47,11 @@ EXECUTABLES		=	${NAME} #Modify if other executables needed#
 #####################################
 
 CC				=	gcc
-CC_FLAGS		=	-Wall -Werror -Wextra
+CC_FLAGS		=	-Wall -Werror -Wextra -Iincludes 
 RM				=	rm -f
 SLEEP_TIME		=	0.3
 SILENT			=	@
-SUFFIX			=	_bonus
+SUFFIX			=	
 
 
 ################################################################################
@@ -67,9 +68,10 @@ SUFFIX			=	_bonus
 
 all:					mandatory bonus
 ${NAME}:				mandatory
-${NAME}${SUFFIX}:		bonus
+
 mandatory:				${EXECUTABLES}
-bonus:					${EXECUTABLES}${SUFFIX}
+bonus:					
+			${SILENT} make ${addsuffix _bonus, ${EXECUTABLES}} DATA_SIZE=16 SUFFIX=_bonus SUB_DIR=bonus/ 
 re:						fclean all
 
 #####################################
@@ -79,20 +81,18 @@ re:						fclean all
 #####################################
 
 ${OBJECTS_DIR}%.o:	${SOURCES_DIR}${SUB_DIR}%.c
-			${SILENT} ${CC} ${FLAGS} -Iincludes -c $< -o ${OBJECTS_FOLDER}${@F:.c=.o}
 			${SILENT} echo  "\033[K\rCreating \"${@F:.c=.o}\".\c"
+			${SILENT} ${CC} ${FLAGS} -c $< -o ${OBJECTS_FOLDER}${@F:.c=.o}
 			${SILENT} sleep ${SLEEP_TIME}
-			
+
 ${LIBRARIES}:		
-
 			${SILENT} make -C $(@D)
-			
-${EXECUTABLES}:			${OBJECTS} ${LIBRARIES}
 
+${EXECUTABLES}:			${OBJECTS_DIR} ${OBJECTS} ${LIBRARIES}
+			${SILENT} echo "\r\"$@\" executable created\033[K"
 			${SILENT} ${CC} $^ -o $@
-			${SILENT} echo "Creating the \"$@\" executable.\033[K\r\c"
 			${SILENT} sleep ${SLEEP_TIME}
-				
+
 #####################################
 #									#
 #				CLEANING			#
@@ -101,32 +101,30 @@ ${EXECUTABLES}:			${OBJECTS} ${LIBRARIES}
 
 clean:
 
-			${SILENT} echo "\033[K\rRemoving objects files (${notdir ${OBJECTS}}).\c"
+			${SILENT} echo "\rRemoving objects files (${notdir ${OBJECTS}}).\033[K\c"
 			${SILENT} ${RM} ${OBJECTS}
 			${SILENT} sleep ${SLEEP_TIME}
 
 clean_bonus:
 
-			${SILENT} make clean SUFFIX=_bonus SUBDIRECTORY=bonus/
-			${SILENT} echo "\033[K\rSwitching to bonus files.\c"
+			${SILENT} echo "\rSwitching to bonus files.\033[K\c"
+			${SILENT} make clean SUFFIX=_bonus SUB_DIR=bonus/
+			${SILENT} make clean_exe SUFFIX=_bonus SUB_DIR=bonus/
 
 clean_libs:
 
+			${SILENT} echo "\rRemoving libraries (${notdir ${LIBRARIES}}).\033[K\c"
 			${SILENT} ${RM} ${LIBRARIES}
-			${SILENT} echo "\033[K\rRemoving libraries (${notdir ${LIBRARIES}}).\c"
 			${SILENT} sleep ${SLEEP_TIME}
 
 clean_exe:
 
-			${SILENT} ${RM} ${EXECUTABLES}
-			${SILENT} echo "\033[K\rRemoving executables (${notdir ${EXECUTABLES}}).\c"
+			${SILENT} echo "\rRemoving executables (${notdir ${EXECUTABLES}}).\033[K\c"
+			${SILENT} ${RM} ${EXECUTABLES} ${EXECUTABLES}${SUFFIX}
 			${SILENT} sleep ${SLEEP_TIME}
 
 fclean:					clean clean_bonus clean_libs clean_exe
-
-			${SILENT} ${RM} ${EXECUTABLES} ${LIBRARIES}
-			${SILENT} echo "\033[K\rEverything removed."
-			${SILENT} sleep ${SLEEP_TIME}
+			${SILENT} echo "\rEverything removed.\033[K"
 				
 #####################################
 #									#
@@ -134,11 +132,16 @@ fclean:					clean clean_bonus clean_libs clean_exe
 #									#
 #####################################
 
+${OBJECTS_DIR}:
+			mkdir ${OBJECTS_DIR}
+
 start:				
-			mkdir -p sources/mandatory/objects
-			mkdir -p sources/bonus/objects
-			mkdir -p includes
-			mkdir -p libraries
-			touch -a sources/mandatory/${SOURCES}
+			${SILENT} mkdir -p sources/mandatory/objects
+			${SILENT} mkdir -p sources/bonus/objects
+			${SILENT} mkdir -p includes
+			${SILENT} mkdir -p libraries
+			${SILENT} touch -a ${addprefix ${SOURCES_DIR}${SUB_DIR}, ${SOURCES}}
+
+.phony: 	fclean clean clean_bonus clean_libs clean_exe start all mandatory bonus re 
 
 .phony: 	fclean clean clean_bonus clean_libs clean_exe start all mandatory bonus re 
