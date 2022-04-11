@@ -37,6 +37,7 @@ LIB_DIR			=	libraries/
 
 SOURCES			=	${NAME}.c#Files to compile#
 OBJECTS 		=	${OBJECTS_DIR}${SOURCES:.c=.o}
+DEPENDS			=	${OBJECTS:.o=.d}
 LIBRARIES		=	#Libraries needed#
 EXECUTABLES		=	${NAME} #Modify if other executables needed#
 
@@ -46,12 +47,11 @@ EXECUTABLES		=	${NAME} #Modify if other executables needed#
 #									#
 #####################################
 
-CC				=	gcc
-CC_FLAGS		=	-Wall -Werror -Wextra -Iincludes 
-RM				=	rm -f
-SLEEP_TIME		=	0.3
+CC			=	gcc
+CC_FLAGS		=	 -Iincludes -Wall -Werror -Wextra
+RM			=	rm -f
+SLEEP_TIME		=	0.2
 SILENT			=	@
-SUFFIX			=	
 
 
 ################################################################################
@@ -68,11 +68,11 @@ SUFFIX			=
 
 all:					mandatory bonus
 ${NAME}:				mandatory
+re:					fclean all
 
-mandatory:				${EXECUTABLES}
+mandatory:				${OBJECTS_DIR} ${EXECUTABLES}
 bonus:					
-			${SILENT} make ${addsuffix _bonus, ${EXECUTABLES}} DATA_SIZE=16 SUFFIX=_bonus SUB_DIR=bonus/ 
-re:						fclean all
+			#Bonus rule 
 
 #####################################
 #									#
@@ -82,16 +82,19 @@ re:						fclean all
 
 ${OBJECTS_DIR}%.o:	${SOURCES_DIR}${SUB_DIR}%.c
 			${SILENT} echo  "\033[K\rCreating \"${@F:.c=.o}\".\c"
-			${SILENT} ${CC} ${FLAGS} -c $< -o ${OBJECTS_FOLDER}${@F:.c=.o}
+			${SILENT} ${CC} ${FLAGS} -MMD -c $< -o ${OBJECTS_FOLDER}${@F:.c=.o}
 			${SILENT} sleep ${SLEEP_TIME}
 
 ${LIBRARIES}:		
 			${SILENT} make -C $(@D)
+			${SILENT} make clean -C $(@D)
 
 ${EXECUTABLES}:			${OBJECTS_DIR} ${OBJECTS} ${LIBRARIES}
 			${SILENT} echo "\r\"$@\" executable created\033[K"
 			${SILENT} ${CC} $^ -o $@
 			${SILENT} sleep ${SLEEP_TIME}
+
+-include ${DEPENDS}
 
 #####################################
 #									#
@@ -107,9 +110,9 @@ clean:
 
 clean_bonus:
 
-			${SILENT} echo "\rSwitching to bonus files.\033[K\c"
-			${SILENT} make clean SUFFIX=_bonus SUB_DIR=bonus/
-			${SILENT} make clean_exe SUFFIX=_bonus SUB_DIR=bonus/
+			#${SILENT} echo "\rSwitching to bonus files.\033[K\c"
+			#${SILENT} make clean SUFFIX=_bonus SUB_DIR=bonus/
+			#${SILENT} make clean_exe SUFFIX=_bonus SUB_DIR=bonus/
 
 clean_libs:
 
@@ -120,10 +123,10 @@ clean_libs:
 clean_exe:
 
 			${SILENT} echo "\rRemoving executables (${notdir ${EXECUTABLES}}).\033[K\c"
-			${SILENT} ${RM} ${EXECUTABLES} ${EXECUTABLES}${SUFFIX}
+			${SILENT} ${RM} ${EXECUTABLES} ${EXECUTABLES}
 			${SILENT} sleep ${SLEEP_TIME}
 
-fclean:					clean clean_bonus clean_libs clean_exe
+fclean:			clean clean_libs clean_exe clean_bonus
 			${SILENT} echo "\rEverything removed.\033[K"
 				
 #####################################
