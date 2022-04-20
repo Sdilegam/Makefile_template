@@ -6,7 +6,7 @@
 #    By: sdi-lega <sdi-lega@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/25 11:25:36 by sdi-lega          #+#    #+#              #
-#    Updated: 2022/04/19 21:04:35 by sdi-lega         ###   ########.fr        #
+#    Updated: 2022/04/20 11:57:51 by sdi-lega         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -73,10 +73,10 @@ EXECUTABLES			=	${NAME} ${NAME}_bonus #Modify if other executables needed#
 #####################################
 
 CC					=	gcc
-COMN_INCLUDE		=	
+COMN_INCLUDE		=	-Iincludes -I${COMN_DIR}headers/ ${addprefix -I, ${addprefix ${LIB_DIR},${dir ${COMN_LIBS}}}}
 MANDA_INCLUDE		=	
 BONUS_INCLUDE		=	
-CC_FLAGS			=	-Iincludes ${addprefix -I, ${addprefix ${LIB_DIR},${dir ${LIBRARIES}}}} -Wall -Werror -Wextra
+CC_FLAGS			=	${COMN_INCLUDE} -Wall -Werror -Wextra
 RM					=	rm -f
 SLEEP_TIME			=	0.2
 SILENT				=	@
