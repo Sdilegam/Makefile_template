@@ -6,7 +6,7 @@
 #    By: sdi-lega <sdi-lega@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/25 11:25:36 by sdi-lega          #+#    #+#              #
-#    Updated: 2022/04/25 15:46:59 by sdi-lega         ###   ########.fr        #
+#    Updated: 2022/04/25 15:47:53 by sdi-lega         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -155,8 +155,8 @@ clean:
 			@ sleep ${SLEEP_TIME}
 
 clean_bonus:
-			@ echo "\rRemoving bonnus objects files (${notdir ${BONUS_OBJECTS}}).\033[K\c"
-			${SILENT} ${RM} ${BONUS_OBJECTS} ${DEPENDS}
+			@ echo "\rRemoving bonnus objects files (${notdir ${BONUS_OBJS}}).\033[K\c"
+			${SILENT} ${RM} ${BONUS_OBJS} ${DEPENDS}
 			@ sleep ${SLEEP_TIME}
 
 ${addprefix clean_,${dir ${ALL_LIBS}}}:
